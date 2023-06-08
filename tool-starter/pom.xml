@@ -17,6 +17,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
+<!--        内部依赖-->
+        <dependency>
+            <groupId>org.xlw.common</groupId>
+            <artifactId>tool-nacos</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+<!--        外部依赖-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
