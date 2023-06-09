@@ -50,4 +50,17 @@
         </dependencies>
     </dependencyManagement>
 
+<!--    上传maven库-->
+    <distributionManagement>
+        <repository>
+            <id>rdc-releases</id>
+            <name>RDC Release Repository</name>
+            <url>rdc-releases::default::https://packages.aliyun.com/maven/repository/2346758-release-CHtPdL/</url>
+        </repository>
+        <snapshotRepository>
+            <id>rdc-snapshots</id>
+            <name>RDC Snapshot Repository</name>
+            <url>rdc-snapshots::default::https://packages.aliyun.com/maven/repository/2346758-snapshot-UcT2Vt/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
