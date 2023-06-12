@@ -1,4 +1,4 @@
-package org.xlw.common.nacos.beans;
+package org.xlw.common.nacos.example;
 
 import lombok.Data;
 import org.xlw.common.nacos.annotations.Bind;
