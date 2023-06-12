@@ -45,6 +45,7 @@ public class NacosConfig {
         try {
             Properties properties = new Properties();
             properties.put("serverAddr", serverAddr);
+            // todo@wanyi-缺少 namespace配置
             /**
              * 1.获取所有的注解bean
              * 2.做一次每个注解类内的static instance的初始化
