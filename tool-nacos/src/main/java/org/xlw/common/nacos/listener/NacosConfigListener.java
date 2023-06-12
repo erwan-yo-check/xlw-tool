@@ -1,47 +1,44 @@
 package org.xlw.common.nacos.listener;
 
-import com.alibaba.nacos.api.config.ConfigChangeEvent;
-import com.alibaba.nacos.api.config.ConfigChangeItem;
-import com.alibaba.nacos.client.config.listener.impl.AbstractConfigChangeListener;
+import com.alibaba.nacos.api.config.listener.AbstractListener;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
+import org.xlw.common.nacos.annotations.Bind;
+import org.xlw.common.util.BeanUtils;
+import org.xlw.common.util.JacksonUtils;
 
-import java.util.Collection;
+import java.lang.reflect.Field;
+import java.util.List;
 
 /**
- * Description: 根据dataId，groupId特定的监听
+ * Description: 根据dataId，groupId特定的类配置监听
  * Author: erwan_check
  * Email: 1076360205@qq.com
  * Date: 2023/6/9 15:30
  */
 @Slf4j
-public class NacosConfigListener extends AbstractConfigChangeListener {
-    private final String dataId;
-
-    private final String group;
+public class NacosConfigListener extends AbstractListener {
 
     private Class clazz;
 
-
-    @Override
-    public void receiveConfigChange(ConfigChangeEvent event) {
-        Collection<ConfigChangeItem> configChangeItems =  event.getChangeItems();
-        configChangeItems.forEach(o -> {
-            System.out.println("key: " + o.getKey());
-            System.out.println("oldValue: " + o.getOldValue());
-            System.out.println("newValue: " + o.getNewValue());
-        });
-
-        ConfigChangeItem check = event.getChangeItem("check");
-
-        if (check != null && "true".equalsIgnoreCase(check.getNewValue())) {
-            System.out.println("这是需要处理的业务");
-        }
-    }
-
-    public NacosConfigListener(String dataId, String group, Class clazz) {
-        this.dataId = dataId;
-        this.group = group;
+    public NacosConfigListener(Class clazz) {
         this.clazz = clazz;
     }
 
+    @Override
+    public void receiveConfigInfo(final String configInfo) {
+        List<Field> fieldList = BeanUtils.getAnnotationField(Bind.class, clazz);
+        if (CollectionUtils.isEmpty(fieldList)) {
+            return;
+        }
+        Field field = fieldList.stream().findFirst().orElse(null);
+        // 更新配置实例
+        field.setAccessible(true);
+        try {
+            field.set(clazz, JacksonUtils.parseJson(clazz, configInfo));
+        } catch (IllegalAccessException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 }

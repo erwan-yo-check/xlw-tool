@@ -2,6 +2,8 @@ package org.xlw.common.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.xlw.common.nacos.beans.ExampleConfig;
+import org.xlw.common.nacos.beans.ExampleConfig2;
 
 /**
  * Description: check_yo
@@ -15,6 +17,12 @@ public class TestController {
 
     @RequestMapping("/hello")
     public String test() {
-        return "yes_wanyi";
+        return ExampleConfig.getInstance().toString();
     }
+
+    @RequestMapping("/config")
+    public String test2() {
+        return ExampleConfig2.getInstance().toString();
+    }
+
 }

@@ -27,5 +27,5 @@ public @interface Bind {
     /**
      * 配置描述
      */
-    String desc();
+    String desc() default "";
 }

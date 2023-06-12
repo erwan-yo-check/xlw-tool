@@ -1,4 +1,4 @@
-package org.xlw.common.nacos;
+package org.xlw.common.nacos.beans;
 
 import lombok.Data;
 import org.xlw.common.nacos.annotations.Bind;
@@ -14,12 +14,12 @@ import org.xlw.common.nacos.annotations.NacosConfigClass;
 @Data
 public class ExampleConfig {
 
-    @Bind(dataId = "111", group = "jjj", desc = "测试dataId")
-    private static ExampleConfig instance = new ExampleConfig();
+    @Bind(dataId = "erwan.test", group = "DEFAULT_GROUP", desc = "测试dataId")
+    public static ExampleConfig instance = new ExampleConfig();
 
-    private String field1;
-    private String field2;
-    private String field3;
+    private String test;
+    private Boolean wow;
+    private Integer yyy;
 
     public static ExampleConfig getInstance() {
         return instance;
