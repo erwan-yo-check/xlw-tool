@@ -18,4 +18,9 @@ public class TestController {
         return ExampleConfig.getInstance().toString();
     }
 
+    public static void main(String[] args) {
+        System.out.println(ExampleConfig.getInstance().getField1());
+        System.out.println(ExampleConfig.getInstance().getField2());
+    }
+
 }
