@@ -8,18 +8,21 @@ import org.xlw.common.nacos.annotations.NacosConfigClass;
  * Description: check_yo
  * Author: erwan_check
  * Email: 1076360205@qq.com
- * Date: 2023/6/9 15:23
+ * Date: 2023/6/12 12:56
  */
-@NacosConfigClass
 @Data
+@NacosConfigClass
 public class ExampleConfig {
 
-    @Bind(dataId = "erwan.test", group = "DEFAULT_GROUP", desc = "测试dataId")
-    public static ExampleConfig instance = new ExampleConfig();
+    private String field1;
 
-    private String test;
-    private Boolean wow;
-    private Integer yyy;
+    private Boolean field2;
+
+    private String field3 = "yes_blank";
+
+    private String[] arr;
+    @Bind(dataId = "test.01.erwan", group = "DEFAULT_GROUP")
+    public static ExampleConfig instance;
 
     public static ExampleConfig getInstance() {
         return instance;

@@ -1,9 +1,17 @@
 package org.xlw.common.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 /**
@@ -15,8 +23,60 @@ import java.util.HashMap;
 @Slf4j
 public class JacksonUtils {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    // 日起格式化
+    private static final String STANDARD_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    static {
+        //对象的所有字段全部列入
+        objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
+        //取消默认转换timestamps形式
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
+        //忽略空Bean转json的错误
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS,false);
+        //所有的日期格式都统一为以下的样式，即yyyy-MM-dd HH:mm:ss
+        objectMapper.setDateFormat(new SimpleDateFormat(STANDARD_FORMAT));
+        //忽略 在json字符串中存在，但是在java对象中不存在对应属性的情况。防止错误
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
+    }
+
+    /**
+     * 对象转Json格式字符串
+     * @param obj 对象
+     * @return Json格式字符串
+     */
+    public static <T> String obj2String(T obj) {
+        if (obj == null) {
+            return null;
+        }
+        try {
+            return obj instanceof String ? (String) obj : objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            log.warn("Parse Object to String error : {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 对象转Json格式字符串(格式化的Json字符串)
+     * @param obj 对象
+     * @return 美化的Json格式字符串
+     */
+    public static <T> String obj2StringPretty(T obj) {
+        if (obj == null) {
+            return null;
+        }
+        try {
+            return obj instanceof String ? (String) obj : objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            log.warn("Parse Object to String error : {}", e.getMessage());
+            return null;
+        }
+    }
+
     /**
      * @desc jsonStr转化为具体类实例处理
+     * 对于集合对象有坑，谨慎使用
      * @date 2023/6/1 11:40
      * @param clazz 类
      * @param json json String
@@ -25,10 +85,11 @@ public class JacksonUtils {
      * @since
     */
     public static <T>T parseJson(Class<T> clazz, String json) {
+        if (StringUtils.isBlank(json) || clazz == null) {
+            return null;
+        }
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            //json字符串转成对象
-            return mapper.readValue(json, clazz);
+            return objectMapper.readValue(json, clazz);
         } catch (JsonProcessingException e) {
             log.error("jacksonUtil error: ", e);
             throw new RuntimeException(e);
@@ -45,7 +106,9 @@ public class JacksonUtils {
      * @since
     */
     public static String parseJsonObj(Object jsonObject) {
-        ObjectMapper objectMapper = new ObjectMapper();
+        if (jsonObject == null) {
+            return null;
+        }
         try {
             return objectMapper.writeValueAsString(jsonObject);
         } catch (JsonProcessingException e) {
@@ -65,11 +128,55 @@ public class JacksonUtils {
     */
     public static String parseMap(HashMap<String,Object> map) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsString(map);
+            return objectMapper.writeValueAsString(map);
         } catch (JsonProcessingException e) {
             log.error("jacksonUtil error: ", e);
             throw new RuntimeException(e);
         }
     }
+
+
+    /**
+     * @desc String to 自定义对象转换（集合对象支持）
+     *
+     * @date 2023/6/13 14:21
+     * @param str
+     * @param typeReference
+     * @return T
+     * @throws
+     * @since
+    */
+    public static <T> T string2Obj(String str, TypeReference<T> typeReference) {
+        if (StringUtils.isEmpty(str) || typeReference == null) {
+            return null;
+        }
+        try {
+            return (T) (typeReference.getType().equals(String.class) ? str : objectMapper.readValue(str, typeReference));
+        } catch (IOException e) {
+            log.warn("Parse String to Object error", e);
+            return null;
+        }
+    }
+
+    /**
+     * @desc String to 集合对象转换
+     *
+     * @date 2023/6/13 14:21
+     * @param str
+     * @param collectionClazz
+     * @param elementClazzes
+     * @return T
+     * @throws
+     * @since
+    */
+    public static <T> T string2Obj(String str, Class<?> collectionClazz, Class<?>... elementClazzes) {
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionClazz, elementClazzes);
+        try {
+            return objectMapper.readValue(str, javaType);
+        } catch (IOException e) {
+            log.warn("Parse String to Object error : {}" + e.getMessage());
+            return null;
+        }
+    }
+
 }
