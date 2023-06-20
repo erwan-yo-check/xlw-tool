@@ -1,4 +1,4 @@
-package org.xlw.common.model;
+package org.xlw.common.model.results;
 
 import lombok.Data;
 import org.xlw.common.enums.ResultsCodeEnum;
@@ -15,8 +15,7 @@ import java.util.Map;
  */
 @Data
 public class Result<T> implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3953310678755660639L;
 
     public Boolean success;
 
