@@ -34,7 +34,7 @@ import java.util.Properties;
 @Slf4j
 public class NacosConfig {
 
-    @Value("${nacos.server.addr}")
+    @Value("${nacos.config.server-addr}")
     private String serverAddr;
 
     @Resource
