@@ -11,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Description: json处理工具-important，尽量不用fastJson，有很多bug
@@ -175,6 +177,31 @@ public class JacksonUtils {
             return objectMapper.readValue(str, javaType);
         } catch (IOException e) {
             log.warn("Parse String to Object error : {}" + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * @desc 实例Obj转Map
+     *
+     * @date 2023/7/6 16:21
+     * @param obj
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     * @throws
+     * @since
+    */
+    public static Map<String, Object> obj2Map(Object obj) {
+        try {
+            Map<String, Object> map;
+            map = objectMapper.convertValue(obj, new TypeReference<Map<String, Object>>() {
+                @Override
+                public Type getType() {
+                    return super.getType();
+                }
+            });
+            return map;
+        } catch (IllegalArgumentException e) {
+            log.warn("Parse Object to Map error", e.getMessage());
             return null;
         }
     }
