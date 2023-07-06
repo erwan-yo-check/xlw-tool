@@ -55,7 +55,7 @@ public class JacksonUtils {
             return obj instanceof String ? (String) obj : objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             log.warn("Parse Object to String error : {}", e.getMessage());
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -72,7 +72,7 @@ public class JacksonUtils {
             return obj instanceof String ? (String) obj : objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             log.warn("Parse Object to String error : {}", e.getMessage());
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -156,7 +156,7 @@ public class JacksonUtils {
             return (T) (typeReference.getType().equals(String.class) ? str : objectMapper.readValue(str, typeReference));
         } catch (IOException e) {
             log.warn("Parse String to Object error", e);
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -177,7 +177,7 @@ public class JacksonUtils {
             return objectMapper.readValue(str, javaType);
         } catch (IOException e) {
             log.warn("Parse String to Object error : {}" + e.getMessage());
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -202,7 +202,7 @@ public class JacksonUtils {
             return map;
         } catch (IllegalArgumentException e) {
             log.warn("Parse Object to Map error", e.getMessage());
-            return null;
+            throw e;
         }
     }
 
